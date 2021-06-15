@@ -7,22 +7,18 @@ from laser import IQTLSLaser, set_freq
 from camera import NITCamera
 from tqdm import trange
 
-c = 299792458.0  # free space light speed
-start_wl = 1530
-stop_wl = 1565
-# step_wl = 0.1
-#
-# wls = np.arange(start_wl, stop_wl + step_wl, step_wl)
 
-
-def start_measurments(time_to_wait, f_st=400e9):
+def start_measurements(time_to_wait, f_st=400e9):
     input("Press Enter to start...")
-
+    c = 299792458.0  # free space light speed [m/s]
+    start_wl = 1530.0  # [nm]
+    stop_wl = 1565.0   # [nm]
     if "y" in input("Set another range or step? [y]:"):
-        pass
-        # start_wl = float(input("Set START wavelength [nm] (format 1550.0): "))
-        # stop_wl = float(input("Set  STOP wavelength [nm] (format 1550.0): "))
-        # step_wl = float(input("Set  STEP wavelength [nm] (format 0.1): "))
+        print("Note. There is MAX and MIN wavelength for laser.")
+        start_wl = float(input("Set START wavelength [nm] (format 1530.0): "))
+        stop_wl = float(input("Set  STOP wavelength [nm] (format 1560.0): "))
+        f_st = float(input("Set  STEP frequency [MHz] (format 8.5): "))
+        f_st *= 1e9
 
     # # # transfer from wl to freq # # #
     f_stop = float(c / round(nm(round(start_wl, 1)), 12))
@@ -66,4 +62,4 @@ def nm(wl_in_nm):
 
 if __name__ == "__main__":
     while True:
-        start_measurments(time_to_wait=0, f_st=8.5e9)
+        start_measurements(time_to_wait=0, f_st=8.5e9)
