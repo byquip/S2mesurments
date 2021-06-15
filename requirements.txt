@@ -1,0 +1,5 @@
+PyVISA==1.11.3
+numpy==1.18.1
+opencv_python==3.4.8.29
+tqdm==4.43.0
+Pillow==8.2.0
