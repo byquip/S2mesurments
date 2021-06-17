@@ -18,7 +18,7 @@ def start_measurements(time_to_wait, f_st=8.5):
         print("Note. There is MAX and MIN wavelength for laser.")
         start_wl = float(input("Set START wavelength [nm] (format 1530.0): "))
         stop_wl = float(input("Set  STOP wavelength [nm] (format 1560.0): "))
-        f_st = float(input("Set  STEP frequency [MHz] (format 8.5): "))
+        f_st = float(input("Set  STEP frequency [GHz] (format 8.5): "))
     f_st *= 1e9
 
     # # # transfer from wl to freq # # #
