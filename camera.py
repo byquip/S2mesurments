@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import USB.NITLibrary_x64_252_py38 as NITLibrary
 import logging
 import time
@@ -5,6 +7,7 @@ import os
 import cv2 as cv
 import glob
 from PIL import Image
+import numpy as np
 
 # log level
 logging.basicConfig(level=logging.INFO)
@@ -13,7 +16,7 @@ logging.basicConfig(level=logging.INFO)
 class NITCamera:
     def __init__(self):
         self.nm = NITLibrary.NITManager.getInstance()
-        self.nm.forceDeviceModel(0, "NSC1401")
+        self.nm.forceDeviceModel(0, "NSC1401")  # (NSC0803|NSC0902|NSC1104|NSC1201|NSC1231|NSC1401|NSC1602)
         self.device = None
         self.gige_cam = None
         self.agc = None
@@ -28,14 +31,38 @@ class NITCamera:
             self.gige_cam = self.device.deviceDescriptor().connectorType() == NITLibrary.ConnectorType.GIGE
             # dev.setParamValueOf("Pixel Clock", "40MHz", False)
             self.device.setParamValueOf("Exposure Time", 100.0, True)
+            print(self.device.manual())
             if self.gige_cam:
                 print("GIGE CAM")
                 self.device.setParamValueOf("OutputType", "RAW")
             self.agc = NITLibrary.NITToolBox.NITAutomaticGainControl()
-            # myMGC = NITLibrary.GIGE.ManualGainControl(0.1, 10, dev.AgcROI("FULL_FRAME"))
+            # agcroi = NITLibrary.AgcROI("FULL_FRAME")
+            # agcroicustom = NITLibrary.AgcROICustom(0, 0, 320, 256)
+            # print(f"{agcroi=}\n{agcroicustom=}")
+            # self.myMGC = NITLibrary.GIGE.ManualGainControl(0.0, 1.0, agcroi)  #  NITLibrary.AgcROI("FULL_FRAME")
+            # self.nuc = NITLibrary.GIGE.NUC1Point()
+            # print(f"{dir(NITLibrary.GIGE.ManualGainControl)=}")
+            # print(f"{dir(NITLibrary)=}")
+            # print(f"{dir(self.myMGC)=}")
+            # print(f"{dir(self.nuc)=}")
+            # print(f"{dir(self.agc)=}")
+            # s = NITLibrary.NITToolBox.ManualGainControl(0.1, 10.0, NITLibrary.AgcROICustom(0, 0, 320, 256))
+            # print(f"{s=}")
             self.snap_shot = NITLibrary.NITToolBox.NITSnapshot(".\\im", "bmp")
+            print("2")
+            # self.device << myMGC << self.snap_shot  # connecting s_sh to agc and dev to agc
+            # self.device << self.myMGC << self.snap_shot
+            # self.myMGC.connectTo(self.device)
+            print("3")
+            # self.snap_shot.connectTo(self.myMGC)
+            # self.snap_shot.connectTo(self.device)
             self.device << self.agc << self.snap_shot  # connecting s_sh to agc and dev to agc
+            #
             print("Camera is ready.")
+
+            # dev << myAGC << myAGCPlayer
+            # myAGC.connectTo(dev)
+            # myAGCPlayer.connectTo(myAGC)
 
     def shot(self, shot_name):
         self.device.start()
@@ -80,4 +107,26 @@ def save_as(name):
 if __name__ == "__main__":
     cam = NITCamera()
     cam.connect()
-    cam.shot("shot_01.bmp")
+
+    li = np.arange(0, 2.5, 0.25)
+    li = np.append(li, 4.0)
+    print(li)
+    # date = datetime.now().strftime("%d-%m-%Y %Hh%Mm")
+    folder_name = f"S2 gain test"
+    try:
+        os.remove(folder_name)
+    except:
+        pass
+    try:
+        os.mkdir(folder_name)
+    except:
+        pass
+    for gain in li:
+        s = int(gain*100)
+        shot_name = f"gain_{s}.bmp"
+        cam.device.setParamValueOf("Gain", str(gain))
+
+        gain_get = cam.device.paramStrValueOf("Gain")
+        print(gain_get, gain)
+        cam.shot(f"{folder_name}\\{shot_name}")
+        # check_screen_shot()

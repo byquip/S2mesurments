@@ -33,6 +33,8 @@ def start_measurements(time_to_wait, f_st=8.5):
     las = IQTLSLaser().las
     cam = NITCamera()
     # # #
+    gain = str(input("Set Gain [0(AGC), 0.25, 0.5 0.75 1.0 1.25 1.5 1.75 2.0 2.25 4.0]: "))
+    cam.device.setParamValueOf("Gain", gain)
 
     date = datetime.now().strftime("%d-%m-%Y %Hh%Mm")
     folder_name = f"S2 {date}"
@@ -41,12 +43,13 @@ def start_measurements(time_to_wait, f_st=8.5):
     print(f"Data will saving at .\\{folder_name}\\shot_{{lambda}}_.bmp")
 
     try:
-        os.mkdir(f"S2 {date}")
+        os.mkdir(folder_name)
     except:
         pass
     t1 = trange(len(f_s))
     for i in t1:
         t1.set_description(f"Current frequency: {f_s[i]:3.7g} [Hz]")
+        # freq -> wl
         shot_name = f"shot_{f_s[i]:3.7g}_.bmp"
 
         set_freq(f_s[i], las)                               # CHANGE WAVELENGTH
