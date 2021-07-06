@@ -13,12 +13,12 @@ def start_measurements(time_to_wait, f_st=8.5):
     c = 299792458.0  # free space light speed [m/s]
     start_wl = 1530.0  # [nm]
     stop_wl = 1565.0   # [nm]
-    print(f"start with \u03BB range: {start_wl}-{stop_wl} [nm] and frequency step: {f_st} [MHz]")
+    print(f"start with \u03BB range: {start_wl}-{stop_wl} [nm] and frequency step: {f_st} [GHz]")
     if "y" in input("set another range or step? [y]:"):
         print("Note. There is MAX and MIN wavelength for laser.")
         start_wl = float(input("Set START wavelength [nm] (format 1530.0): "))
         stop_wl = float(input("Set  STOP wavelength [nm] (format 1560.0): "))
-        f_st = float(input("Set  STEP frequency [MHz] (format 8.5): "))
+        f_st = float(input("Set  STEP frequency [GHz] (format 8.5): "))
     f_st *= 1e9
 
     # # # transfer from wl to freq # # #
