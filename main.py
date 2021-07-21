@@ -6,6 +6,7 @@ import numpy as np
 from laser import IQTLSLaser, set_freq
 from camera import NITCamera
 from tqdm import trange
+import parameters
 
 
 def start_measurements(time_to_wait, f_st=8.5):
@@ -32,9 +33,6 @@ def start_measurements(time_to_wait, f_st=8.5):
     # # # Start devices
     las = IQTLSLaser().las
     cam = NITCamera()
-    # # #
-    gain = str(input("Set Gain [0(AGC), 0.25, 0.5 0.75 1.0 1.25 1.5 1.75 2.0 2.25 4.0]: "))
-    cam.device.setParamValueOf("Gain", gain)
 
     date = datetime.now().strftime("%d-%m-%Y %Hh%Mm")
     folder_name = f"S2 {date}"
@@ -46,6 +44,7 @@ def start_measurements(time_to_wait, f_st=8.5):
         os.mkdir(folder_name)
     except:
         pass
+
     t1 = trange(len(f_s))
     for i in t1:
         t1.set_description(f"Current frequency: {f_s[i]:3.7g} [Hz]")
@@ -58,6 +57,7 @@ def start_measurements(time_to_wait, f_st=8.5):
 
     zip_name = f"{folder_name}.zip"
     shutil.make_archive(zip_name, "zip", folder_name)
+    print(f"check folder:\"{folder_name}\" for screens")
 
 
 def nm(wl_in_nm):
@@ -66,4 +66,4 @@ def nm(wl_in_nm):
 
 if __name__ == "__main__":
     while True:
-        start_measurements(time_to_wait=0, f_st=8.5)
+        start_measurements(time_to_wait=parameters.shot_delay, f_st=8.5)

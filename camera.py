@@ -8,6 +8,7 @@ import cv2 as cv
 import glob
 from PIL import Image
 import numpy as np
+import parameters
 
 # log level
 logging.basicConfig(level=logging.INFO)
@@ -16,7 +17,7 @@ logging.basicConfig(level=logging.INFO)
 class NITCamera:
     def __init__(self):
         self.nm = NITLibrary.NITManager.getInstance()
-        self.nm.forceDeviceModel(0, "NSC1401")  # (NSC0803|NSC0902|NSC1104|NSC1201|NSC1231|NSC1401|NSC1602)
+        # self.nm.forceDeviceModel(0, "NSC1401")  # (NSC0803|NSC0902|NSC1104|NSC1201|NSC1231|NSC1401|NSC1602)
         self.device = None
         self.gige_cam = None
         self.agc = None
@@ -34,6 +35,7 @@ class NITCamera:
             print(self.device.manual())
             if self.gige_cam:
                 print("GIGE CAM")
+
                 self.device.setParamValueOf("OutputType", "RAW")
             self.agc = NITLibrary.NITToolBox.NITAutomaticGainControl()
             # agcroi = NITLibrary.AgcROI("FULL_FRAME")
@@ -49,15 +51,17 @@ class NITCamera:
             # s = NITLibrary.NITToolBox.ManualGainControl(0.1, 10.0, NITLibrary.AgcROICustom(0, 0, 320, 256))
             # print(f"{s=}")
             self.snap_shot = NITLibrary.NITToolBox.NITSnapshot(".\\im", "bmp")
-            print("2")
+            # print("2")
             # self.device << myMGC << self.snap_shot  # connecting s_sh to agc and dev to agc
             # self.device << self.myMGC << self.snap_shot
             # self.myMGC.connectTo(self.device)
-            print("3")
+            # print("3")
             # self.snap_shot.connectTo(self.myMGC)
             # self.snap_shot.connectTo(self.device)
-            self.device << self.agc << self.snap_shot  # connecting s_sh to agc and dev to agc
-            #
+            self.device.setParamValueOf("Gain", parameters.cam_gain)
+            self.device.setParamValueOf("Offset", parameters.cam_offset)
+            self.device <<self.snap_shot  # connecting s_sh to agc and dev to agc
+
             print("Camera is ready.")
 
             # dev << myAGC << myAGCPlayer
@@ -96,6 +100,9 @@ def check_screen_shot():
 
 def save_as(name):
     files = glob.glob("*.bmp")
+    if len(files) < 1:
+        print("PICTURE DONT SAVED")
+        return
     latest_file = max(files, key=os.path.getctime)
     with Image.open(latest_file) as im:
         with open(name, 'wb') as f:
@@ -125,8 +132,20 @@ if __name__ == "__main__":
         s = int(gain*100)
         shot_name = f"gain_{s}.bmp"
         cam.device.setParamValueOf("Gain", str(gain))
-
+        cam.device.setParamValueOf("Offset", "50.0")
         gain_get = cam.device.paramStrValueOf("Gain")
-        print(gain_get, gain)
+        offset_get = cam.device.paramStrValueOf("Offset")
+        print(gain_get, gain, offset_get)
         cam.shot(f"{folder_name}\\{shot_name}")
         # check_screen_shot()
+    li = np.arange(50, 61, 1)
+    cam.device.setParamValueOf("Gain", "0.25")
+    for ofs in li:
+        s = int(ofs)
+        shot_name = f"ofs_{s}.bmp"
+        # cam.device.setParamValueOf("Gain", str(gain))
+        cam.device.setParamValueOf("Offset", str(ofs))
+        # gain_get = cam.device.paramStrValueOf("Gain")
+        offset_get = cam.device.paramStrValueOf("Offset")
+        print(offset_get, ofs)
+        cam.shot(f"{folder_name}\\{shot_name}")
