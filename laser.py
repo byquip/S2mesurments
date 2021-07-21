@@ -3,13 +3,19 @@ import pyvisa
 
 class IQTLSLaser:
     def __init__(self):
-        self.rm = pyvisa.ResourceManager()
-        try:
-            self.las = self.rm.open_resource("TCPIP0::192.168.95.201::inst0::INSTR")
-        except:
-            pass
-        else:
-            print("Laser is ready.")
+        while True:
+            self.rm = pyvisa.ResourceManager()
+            try:
+                self.las = self.rm.open_resource("TCPIP0::192.168.95.201::inst0::INSTR")
+            except:
+                self.las = None
+            else:
+                print("Laser is ready.")
+
+            if self.las is None:
+                input("Laser not connected.\n Connect Laser and press [Enter].")
+            else:
+                break
         # test_las(self.las)
 
 

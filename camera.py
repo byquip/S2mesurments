@@ -27,7 +27,8 @@ class NITCamera:
     def connect(self):
         self.device = self.nm.openOneDevice()
         if self.device is None:
-            print("No Device Connected")
+            input("No Camera Connected.\n Connect Camera and press [Enter].")
+            self.__init__()
         else:
             self.gige_cam = self.device.deviceDescriptor().connectorType() == NITLibrary.ConnectorType.GIGE
             # dev.setParamValueOf("Pixel Clock", "40MHz", False)

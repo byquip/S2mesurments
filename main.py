@@ -38,7 +38,7 @@ def start_measurements(time_to_wait, f_st=8.5):
     folder_name = f"S2 {date}"
 
     print(f"Start \u03BB: {start_wl} [nm] | Stop \u03BB {stop_wl} [nm] | Step \u03BB: {f_st:g} [Hz]")
-    print(f"Data will saving at .\\{folder_name}\\shot_{{lambda}}_.bmp")
+    print(f"Data will saving at .\\{folder_name}\\shot_{{lambda}}_.bmp  lambda in [nm]")
 
     try:
         os.mkdir(folder_name)
@@ -49,7 +49,9 @@ def start_measurements(time_to_wait, f_st=8.5):
     for i in t1:
         t1.set_description(f"Current frequency: {f_s[i]:3.7g} [Hz]")
         # freq -> wl
-        shot_name = f"shot_{f_s[i]:3.7g}_.bmp"
+        current_wavelength = float(c / f_s[i]) * 1e9
+        current_wavelength = round(current_wavelength, 5)
+        shot_name = f"shot_{current_wavelength:.5f}_.bmp"
 
         set_freq(f_s[i], las)                               # CHANGE WAVELENGTH
         time.sleep(time_to_wait)                            # WAIT 3 seconds
